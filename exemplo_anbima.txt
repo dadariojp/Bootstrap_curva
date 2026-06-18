@@ -1,0 +1,10 @@
+ANBIMA - Associação Brasileira das Entidades dos Mercados Financeiro e de Capitais
+Titulo@Data Referencia@Codigo SELIC@Data Base/Emissao@Data Vencimento@Tx. Compra@Tx. Venda@Tx.
+,→ Indicativas@PU@Desvio padrao@Interv. Ind. Inf. (D0)@Interv. Ind. Sup. (D0)@Interv. Ind. Inf. (D+1)
+,→ @Interv. Ind. Sup. (D+1)@Criterio
+LTN@20260601@100000@20230106@20260701@14,3883@14,3711@14,3798@988,866252@0,0056547759655@14,2515@14,5371@14
+,→ ,263@14,5509@Calculado
+LTN@20260601@100000@20240705@20261001@14,0237@13,9757@14,0034@956,259296@0,00276624207726@13,8132@14,1519
+,→ @13,8553@14,1917@Calculado
+NTN-F@20260601@950199@20160115@20270101@14,071@14,0332@14,0521@1019,143414@0,00146796677755@13,7404@14,2714
+,→ @13,8322@14,3596@Calculado

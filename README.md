@@ -21,7 +21,7 @@ A implementação respeita as convenções brasileiras:
 O preço de um título é a soma de seus fluxos futuros descontados:
 
 \[
-P_j = \sum_{i=1}^{n} C_{j,i} \cdot d_i
+P_j = Σ_{i=1..n} C_{j,i} * d_i
 \]
 
 onde:
