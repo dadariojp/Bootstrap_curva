@@ -1,53 +1,87 @@
-# Bootstrap de Curva Zero-Cupom (Tesouro Direto)
+# Bootstrap da Curva Zero-Cupom (Tesouro Direto)
 
-Solução para o desafio de bootstrapping de títulos públicos prefixados (LTN e NTN-F), conforme especificação da ANBIMA.
+Solução completa para o desafio de bootstrapping de títulos públicos prefixados (LTN e NTN-F), conforme especificação da ANBIMA.
 
-## (a) Modelagem do Problema
+---
 
-O preço de um título é a soma de seus fluxos futuros descontados por fatores de desconto di:
+## Visão Geral
 
-P = Σ VFi * di
+O programa lê os arquivos de preços (formato ANBIMA) e de feriados, constrói a **curva de juros zero-cupom** a partir dos PUs de mercado e retorna os fatores de desconto e taxas spot anuais para cada vértice (data de pagamento).
 
-Para um conjunto de títulos com vencimentos em n datas distintas, construímos:
-- **C** ∈ R^(m×n): matriz de fluxos de caixa, onde C[j][i] é o valor pago pelo título j na data i.
-- **P** ∈ R^m: vetor de preços de mercado (PU).
-- **d** ∈ R^n: vetor de fatores de desconto (incógnitas).
+A implementação respeita as convenções brasileiras:
+- Base de dias úteis: 252
+- Contagem de dias úteis excluindo fins de semana e feriados
+- LTN: zero-cupom, paga R$ 1.000 no vencimento
+- NTN-F: cupom semestral de 10% a.a. (R$ 48,8088 por cupom) + principal R$ 1.000
 
-O sistema a ser resolvido é: **C · d = P**.
+---
 
-Para títulos LTN (zero-cupom) e NTN-F (com cupons semestrais de 10% a.a.), a matriz C é triangular inferior quando ordenamos os títulos por vencimento crescente, permitindo resolução sequencial.
+## Modelagem do Problema (a)
 
-Os dias úteis são contados com base no calendário da ANBIMA (excluindo fins de semana e feriados), e a convenção de ano é de 252 dias úteis.
+O preço de um título é a soma de seus fluxos futuros descontados:
 
-A taxa spot anual é recuperada por: s_i = d_i^(-1/prazo_anos) - 1.
+\[
+P_j = \sum_{i=1}^{n} C_{j,i} \cdot d_i
+\]
 
-## (b) Método de Resolução e Justificativa
+onde:
+- \( C_{j,i} \) é o fluxo de caixa (valor futuro) do título \( j \) no vértice \( i \)
+- \( d_i \) é o fator de desconto do vértice \( i \) (incógnita)
 
-Escolhi a **substituição progressiva (forward substitution)** para resolver o sistema linear triangular inferior.
+Para um conjunto de \( m \) títulos com pagamentos em \( n \) datas distintas, o sistema linear é:
+
+\[
+C \cdot d = P
+\]
+
+Aqui:
+- \( C \) é a matriz de fluxos (m × n)
+- \( d \) é o vetor de fatores de desconto (n × 1)
+- \( P \) é o vetor de preços de mercado (m × 1)
+
+A estrutura do problema é explorada para garantir que \( C \) seja **triangular inferior**, permitindo resolução por substituição progressiva.
+
+---
+
+## Método de Resolução (b)
+
+### Escolha do método: **substituição progressiva (forward substitution)**
 
 **Justificativa:**
-1. O enunciado (Seção 2.4) explicitamente orienta a explorar a estrutura triangular inferior da matriz C.
-2. É o método mais estável numericamente para este caso, pois não envolve inversão de matrizes ou eliminação gaussiana completa.
-3. É extremamente eficiente: cada fator de desconto é calculado diretamente a partir do título de vencimento mais curto, usando os fatores já resolvidos para os vértices anteriores.
-4. Atende ao requisito de não usar bibliotecas prontas de bootstrapping, utilizando apenas numpy para operações básicas.
+1. O enunciado (Seção 2.4) orienta a explorar a estrutura triangular inferior da matriz C.
+2. O método é **estável numericamente** não exige inversão de matrizes, fatoração LU ou eliminação de Gauss.
+3. É **eficiente**: cada fator de desconto é calculado diretamente a partir do título de vencimento mais curto, usando os fatores já resolvidos para os vértices anteriores.
+4. Atende ao requisito de não usar bibliotecas prontas de bootstrapping, foi utilizado apenas `numpy` (para operações básicas) e bibliotecas padrão.
 
-## (c) Complexidade da Solução
+### Estratégia de filtragem dos títulos
 
-- **Tempo:** O(n²), onde n é o número de vértices (datas de pagamento). Isso porque, para cada título i, iteramos sobre todos os fluxos anteriores j < i.
-- **Espaço:** O(n²) para armazenar a matriz de fluxos, ou O(n) se otimizado para armazenar apenas a diagonal e os fluxos passados. No código, usei uma abordagem direta com matriz O(n²) por clareza, já que n é pequeno (títulos do Tesouro Direto).
+Para obter a matriz triangular, o código implementa uma função `filter_triangular_bonds()` que:
 
-## Validação (R5)
+- Seleciona **todas as LTNs** (pois são zero-cupom e cada uma contribui com uma única data).
+- Para cada NTN-F, verifica se:
+  - Seu vencimento **não** coincide com outra data já conhecida.
+  - Possui **pelo menos um cupom futuro** (não é zero-cupom).
+  - **Todos os seus cupons futuros** já estão presentes no conjunto de datas conhecidas (garantia de triangularidade).
 
-A solução re-precifica cada título de entrada usando a curva gerada. O erro absoluto máximo é inferior a 1×10⁻⁴, conforme exigido.
+Isso assegura que a matriz C seja **quadrada e triangular inferior** sem necessidade de interpolação ou ajustes artificiais.
 
-## Como executar
+---
+
+## Complexidade da Solução (c)
+
+- **Tempo:** \( O(n^2) \), onde \( n \) é o número de vértices (datas de pagamento). Para cada título \( i \), percorremos todos os fluxos anteriores \( j < i \).
+- **Espaço:** \( O(n^2) \) para armazenar a matriz C (por simplicidade, pois \( n \) é pequeno, tipicamente < 50 títulos). Pode ser otimizada para \( O(n) \) com armazenamento esparso, mas optamos pela clareza.
+
+---
+
+## Como Executar
+
+### Dependências
+
+- Python 3.8+ (ou 3.10+ para a sintaxe de type hints com `|`, mas o código usa `Optional` para compatibilidade)
+- Bibliotecas: `xlrd` (para ler arquivos .xls de feriados)
+
+Instale a dependência:
 
 ```bash
-# Instale as dependências
-pip install numpy pytest
-
-# Execute o bootstrap
-python main.py  # (ou o nome do seu script principal)
-
-# Rode os testes automatizados
-pytest test_bootstrap.py -v
+pip install xlrd
