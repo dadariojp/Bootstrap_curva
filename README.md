@@ -77,8 +77,8 @@ Isso assegura que a matriz C seja **quadrada e triangular inferior** sem necessi
 
 ### Dependências
 
-- Python 3.8+ (ou 3.10+ para a sintaxe de type hints com `|`, mas o código usa `Optional` para compatibilidade)
-- Bibliotecas: `xlrd` (para ler arquivos .xls de feriados)
+- Python 3.10+
+- Bibliotecas: `xlrd` 
 
 Instale a dependência:
 
@@ -91,15 +91,17 @@ pip install xlrd
 ```bash
 python bootstrap.py <caminho_para_titulos.txt> <caminho_para_feriados.xls|csv|txt>
 ```
-###Exemplo
+### Exemplo
 
 ```bash:
 
 python bootstrap.py exemplo_anbima.txt feriados_nacionais.xls
 ```
 
-###Saída
+### Saída
+
 A função imprime um JSON com:
+
 
 json
 {
@@ -122,9 +124,9 @@ json
 
 ## Validação (R5)
 
-Após a resolução, o código recalcula (re-precifica) **cada título de entrada** usando os fatores de desconto obtidos.
+Após a resolução, o código recalcula (re-precifica) cada título de entrada usando os fatores de desconto obtidos.
 
-O erro máximo absoluto entre o preço original e o recalculado é calculado na função `repricing_error()`. O valor deve ser **inferior a $10^{-4}$**, conforme exigido.
+O erro máximo absoluto entre o preço original e o recalculado é calculado na função `repricing_error()`. O valor deve ser inferior a $10^{-4}$, conforme exigido.
 
 Para executar o teste automatizado:
 
@@ -153,8 +155,6 @@ pytest test_bootstrap.py -v
 ## Observações finais
 
 - O código foi desenvolvido seguindo as convenções de mercado brasileiro e as orientações do desafio.
-- A escolha por **não usar bibliotecas de bootstrapping** prontas garante total transparência e controle sobre o método.
-- A solução é **modular** e facilmente adaptável para novos tipos de títulos ou calendários de feriados.
 
 ---
 
