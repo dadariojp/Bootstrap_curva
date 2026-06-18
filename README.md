@@ -85,3 +85,78 @@ Instale a dependência:
 ```
 pip install xlrd
 ```
+
+### Comando
+
+```bash
+python bootstrap.py <caminho_para_titulos.txt> <caminho_para_feriados.xls|csv|txt>
+```
+###Exemplo
+
+```bash:
+
+python bootstrap.py exemplo_anbima.txt feriados_nacionais.xls
+```
+
+###Saída
+A função imprime um JSON com:
+
+json
+{
+  "data_base": "2026-06-01",
+  "erro_reprecificacao": 0.0,
+  "curva": [
+    {
+      "data": "2026-07-01",
+      "du": 21,
+      "prazo_anos": 0.083333,
+      "fator_desconto": 0.988866,
+      "taxa_spot": 0.143798
+    },
+    ...
+  ]
+}
+
+
+---
+
+## Validação (R5)
+
+Após a resolução, o código recalcula (re-precifica) **cada título de entrada** usando os fatores de desconto obtidos.
+
+O erro máximo absoluto entre o preço original e o recalculado é calculado na função `repricing_error()`. O valor deve ser **inferior a $10^{-4}$**, conforme exigido.
+
+Para executar o teste automatizado:
+
+```bash
+pytest test_bootstrap.py -v
+```
+
+
+**Status:** Todos os testes passam (erro de re-precificação < $10^{-4}$).
+
+---
+
+## Estrutura do Código
+
+- `parse_*` – Leitura dos arquivos da ANBIMA e feriados
+- `generate_cash_flows` – Geração dos fluxos para LTN e NTN-F
+- `filter_triangular_bonds` – Seleção inteligente de títulos para garantir matriz triangular
+- `build_system` – Montagem da matriz $C$ e vetor $P$
+- `forward_substitution` – Resolução do sistema triangular
+- `compute_spot_curve` – Cálculo das taxas spot a partir dos fatores de desconto
+- `repricing_error` – Validação da re-precificação
+- `bootstrap` – Função principal que orquestra todo o processo
+
+---
+
+## Observações finais
+
+- O código foi desenvolvido seguindo as convenções de mercado brasileiro e as orientações do desafio.
+- A escolha por **não usar bibliotecas de bootstrapping** prontas garante total transparência e controle sobre o método.
+- A solução é **modular** e facilmente adaptável para novos tipos de títulos ou calendários de feriados.
+
+---
+
+**Autor:** João Pedro Dadario Pereira
+**Data:** Junho/2026
