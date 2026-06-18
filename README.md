@@ -24,15 +24,14 @@ $$
 P_j = \sum_{i=1}^{n} C_{j,i} \cdot d_i
 $$
 
-onde:
-- \( C_{j,i} \) é o fluxo de caixa (valor futuro) do título \( j \) no vértice \( i \)
-- \( d_i \) é o fator de desconto do vértice \( i \) (incógnita)
+- $C_{j,i}$ é o fluxo de caixa (valor futuro) do título $j$ no vértice $i$
+- $d_i$ é o fator de desconto do vértice $i$ (incógnita)
 
-Para um conjunto de \( m \) títulos com pagamentos em \( n \) datas distintas, o sistema linear é:
+Para um conjunto de $m$ títulos com pagamentos em $n$ datas distintas, o sistema linear é:
 
-\[
+$$
 C \cdot d = P
-\]
+$$
 
 Aqui:
 - \( C \) é a matriz de fluxos (m × n)
