@@ -20,9 +20,9 @@ A implementação respeita as convenções brasileiras:
 
 O preço de um título é a soma de seus fluxos futuros descontados:
 
-\[
-P_j = Σ_{i=1..n} C_{j,i} * d_i
-\]
+$$
+P_j = \sum_{i=1}^{n} C_{j,i} \cdot d_i
+$$
 
 onde:
 - \( C_{j,i} \) é o fluxo de caixa (valor futuro) do título \( j \) no vértice \( i \)
@@ -83,5 +83,6 @@ Isso assegura que a matriz C seja **quadrada e triangular inferior** sem necessi
 
 Instale a dependência:
 
-```bash
+```
 pip install xlrd
+```
