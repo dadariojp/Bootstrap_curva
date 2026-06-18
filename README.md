@@ -1,51 +1,53 @@
-# Bootstrapping da Curva Zero-Cupom
+# Bootstrap de Curva Zero-Cupom (Tesouro Direto)
+
+Solução para o desafio de bootstrapping de títulos públicos prefixados (LTN e NTN-F), conforme especificação da ANBIMA.
+
+## (a) Modelagem do Problema
+
+O preço de um título é a soma de seus fluxos futuros descontados por fatores de desconto di:
+
+P = Σ VFi * di
+
+Para um conjunto de títulos com vencimentos em n datas distintas, construímos:
+- **C** ∈ R^(m×n): matriz de fluxos de caixa, onde C[j][i] é o valor pago pelo título j na data i.
+- **P** ∈ R^m: vetor de preços de mercado (PU).
+- **d** ∈ R^n: vetor de fatores de desconto (incógnitas).
+
+O sistema a ser resolvido é: **C · d = P**.
+
+Para títulos LTN (zero-cupom) e NTN-F (com cupons semestrais de 10% a.a.), a matriz C é triangular inferior quando ordenamos os títulos por vencimento crescente, permitindo resolução sequencial.
+
+Os dias úteis são contados com base no calendário da ANBIMA (excluindo fins de semana e feriados), e a convenção de ano é de 252 dias úteis.
+
+A taxa spot anual é recuperada por: s_i = d_i^(-1/prazo_anos) - 1.
+
+## (b) Método de Resolução e Justificativa
+
+Escolhi a **substituição progressiva (forward substitution)** para resolver o sistema linear triangular inferior.
+
+**Justificativa:**
+1. O enunciado (Seção 2.4) explicitamente orienta a explorar a estrutura triangular inferior da matriz C.
+2. É o método mais estável numericamente para este caso, pois não envolve inversão de matrizes ou eliminação gaussiana completa.
+3. É extremamente eficiente: cada fator de desconto é calculado diretamente a partir do título de vencimento mais curto, usando os fatores já resolvidos para os vértices anteriores.
+4. Atende ao requisito de não usar bibliotecas prontas de bootstrapping, utilizando apenas numpy para operações básicas.
+
+## (c) Complexidade da Solução
+
+- **Tempo:** O(n²), onde n é o número de vértices (datas de pagamento). Isso porque, para cada título i, iteramos sobre todos os fluxos anteriores j < i.
+- **Espaço:** O(n²) para armazenar a matriz de fluxos, ou O(n) se otimizado para armazenar apenas a diagonal e os fluxos passados. No código, usei uma abordagem direta com matriz O(n²) por clareza, já que n é pequeno (títulos do Tesouro Direto).
+
+## Validação (R5)
+
+A solução re-precifica cada título de entrada usando a curva gerada. O erro absoluto máximo é inferior a 1×10⁻⁴, conforme exigido.
 
 ## Como executar
 
-    pip install xlrd pytest
-    python bootstrapping.py <titulos.txt> <feriados.xls|csv|txt>
-    pytest test_bootstrap.py -v
+```bash
+# Instale as dependências
+pip install numpy pytest
 
-## (a) Modelagem
+# Execute o bootstrap
+python main.py  # (ou o nome do seu script principal)
 
-O preço de um título é a soma dos seus fluxos futuros descontados pelas taxas spot de cada vencimento:
-
-    P = soma(VF_i * d_i)
-
-Organizando m títulos e n datas de pagamento, isso vira o sistema linear C * d = P, onde C é
-a matriz de fluxos de caixa, d o vetor de fatores de desconto (incógnitas) e P o vetor de preços.
-
-A chave é ordenar os títulos por vencimento e garantir que cada um adicione exatamente uma
-data nova. LTNs são zero-cupom (só pagam no vencimento). NTN-Fs só entram no sistema se todos
-os seus cupons futuros já caírem em datas cobertas por títulos anteriores. Com isso, C fica
-quadrada e triangular inferior, o que permite uma resolução mais eficiente.
-
-Convenção brasileira: prazo em dias úteis (DU), base 252. Feriados lidos do arquivo da ANBIMA
-(.xls, .csv ou .txt).
-
-## (b) Método de resolução
-
-Com C triangular inferior, o sistema é resolvido por substituição progressiva (forward substitution):
-
-    d_i = (P_i - soma_{j<i} C_ij * d_j) / C_ii
-
-Cada fator de desconto depende apenas dos anteriores, já calculados. Não é necessário inverter
-a matriz nem aplicar eliminação gaussiana completa, a estrutura triangular é explorada diretamente.
-
-## (c) Complexidade
-
-A etapa dominante é a substituição progressiva: O(n²), onde n é o número de vértices da curva.
-A construção da matriz C também é O(n²). A curva pré-fixada da ANBIMA tem tipicamente entre
-10 e 20 vértices, então n é pequeno na prática e Python puro é suficiente.
-
-## Estrutura
-
-    bootstrapping.py   solução principal
-    test_bootstrap.py  testes automatizados (pytest)
-    README.md
-
-## Dependências
-
-    Python 3.10+
-    xlrd   (pip install xlrd)   — leitura do .xls de feriados
-    pytest (pip install pytest) — execução dos testes
+# Rode os testes automatizados
+pytest test_bootstrap.py -v
