@@ -18,7 +18,7 @@ a matriz de fluxos de caixa, d o vetor de fatores de desconto (incógnitas) e P 
 A chave é ordenar os títulos por vencimento e garantir que cada um adicione exatamente uma
 data nova. LTNs são zero-cupom (só pagam no vencimento). NTN-Fs só entram no sistema se todos
 os seus cupons futuros já caírem em datas cobertas por títulos anteriores. Com isso, C fica
-quadrada e triangular inferior — o que permite uma resolução mais eficiente.
+quadrada e triangular inferior, o que permite uma resolução mais eficiente.
 
 Convenção brasileira: prazo em dias úteis (DU), base 252. Feriados lidos do arquivo da ANBIMA
 (.xls, .csv ou .txt).
