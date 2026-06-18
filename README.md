@@ -48,8 +48,8 @@ A estrutura do problema é explorada para garantir que \( C \) seja **triangular
 
 **Justificativa:**
 1. O enunciado (Seção 2.4) orienta a explorar a estrutura triangular inferior da matriz C.
-2. O método é **estável numericamente** não exige inversão de matrizes, fatoração LU ou eliminação de Gauss.
-3. É **eficiente**: cada fator de desconto é calculado diretamente a partir do título de vencimento mais curto, usando os fatores já resolvidos para os vértices anteriores.
+2. O método evita precisar inverter matriz, o que seria desnecessário aqui.
+3. É eficiente, pois cada fator de desconto é calculado diretamente a partir do título de vencimento mais curto, usando os fatores já resolvidos para os vértices anteriores.
 4. Atende ao requisito de não usar bibliotecas prontas de bootstrapping, foi utilizado apenas `numpy` (para operações básicas) e bibliotecas padrão.
 
 ### Estratégia de filtragem dos títulos
